@@ -36,24 +36,24 @@
         <div id="heatmap-controls">
             <h2>Heatmap Settings</h2>
             <div class="slider-group">
-                <label>Min Distance: <span id="val-minDist">1</span> km <span class="info-pill" data-tooltip="Pubs closer than this distance to their replacement are excluded from the heatmap entirely.">?</span></label>
-                <input type="range" id="slider-minDist" min="0" max="2" step="0.05" value="1">
+                <label>Min Distance: <span id="val-minDist">0.5</span> km <span class="info-pill" data-tooltip="Pubs closer than this distance to their replacement are excluded from the heatmap entirely.">?</span></label>
+                <input type="range" id="slider-minDist" min="0" max="2" step="0.05" value="0.5">
             </div>
             <div class="slider-group">
-                <label>Intensity Curve: <span id="val-power">2</span> <span class="info-pill" data-tooltip="Controls how aggressively low distances are suppressed. Higher values make only the most distant pubs visible; lower values (closer to 1) give a more linear/even spread.">?</span></label>
-                <input type="range" id="slider-power" min="0.5" max="4" step="0.25" value="2">
+                <label>Intensity Curve: <span id="val-power">1</span> <span class="info-pill" data-tooltip="Controls how aggressively low distances are suppressed. Higher values make only the most distant pubs visible; lower values (closer to 1) give a more linear/even spread.">?</span></label>
+                <input type="range" id="slider-power" min="0.5" max="4" step="0.25" value="1">
             </div>
             <div class="slider-group">
                 <label>Radius: <span id="val-radius">30</span> px <span class="info-pill" data-tooltip="The pixel radius of each heat point. Larger values create broader, more overlapping blobs; smaller values produce tighter, more isolated spots.">?</span></label>
                 <input type="range" id="slider-radius" min="10" max="80" step="2" value="30">
             </div>
             <div class="slider-group">
-                <label>Blur: <span id="val-blur">18</span> px <span class="info-pill" data-tooltip="How much each heat point is blurred at its edges. Higher values create softer gradients; lower values give sharper boundaries.">?</span></label>
-                <input type="range" id="slider-blur" min="5" max="50" step="2" value="18">
+                <label>Blur: <span id="val-blur">21</span> px <span class="info-pill" data-tooltip="How much each heat point is blurred at its edges. Higher values create softer gradients; lower values give sharper boundaries.">?</span></label>
+                <input type="range" id="slider-blur" min="5" max="50" step="2" value="21">
             </div>
             <div class="slider-group">
-                <label>Max Opacity: <span id="val-maxOpacity">0.8</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
-                <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.8">
+                <label>Max Opacity: <span id="val-maxOpacity">0.5</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
+                <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.5">
             </div>
         </div>
     </div>
