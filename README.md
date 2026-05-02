@@ -75,7 +75,7 @@ Then open http://localhost:8000.
 
 ## Credits
 
-Made by **Ryan B**, with the assistance of **Claude Opus 4.6** (Anthropic) and **MinMax 2.7**.
+Made by **Ryan B**, with the assistance of **Claude Opus 4.6** (Anthropic) and **MinMax 2.7** using OpenCode.
 
 ## License
 
