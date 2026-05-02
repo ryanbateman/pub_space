@@ -23,14 +23,14 @@
             <div id="legend">
                 <h2>Distance to next pub</h2>
                 <div class="legend-bar"></div>
-                <div class="legend-labels">
-                    <span>0 km</span>
-                    <span>0.25</span>
-                    <span>0.5</span>
-                    <span>0.75</span>
-                    <span>1.0</span>
-                    <span>1.5+ km</span>
-                </div>
+            <div class="legend-labels">
+                <span>0 km</span>
+                <span>0.5</span>
+                <span>1.0</span>
+                <span>1.5</span>
+                <span>2.0</span>
+                <span>2.6 km</span>
+            </div>
             </div>
         </div>
         <div id="heatmap-controls">
@@ -55,6 +55,10 @@
                 <label>Max Opacity: <span id="val-maxOpacity">0.5</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
                 <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.5">
             </div>
+        </div>
+        <div id="stats-box">
+            <h2>Stats</h2>
+            <div id="stats-content">Loading...</div>
         </div>
     </div>
 

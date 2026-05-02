@@ -16,17 +16,17 @@ let nearestLineLayer = L.layerGroup();
 let nearestLineEnabled = true;
 let lineHideTimeout = null;
 let popupOpen = false;
+let markersByTitle = {};
 
-// Shared colour scale: thresholds tuned to data distribution (P10-P90)
-// Same stops used for both dot markers and heatmap gradient
-const DIST_MAX = 1.5; // km — P90 cap; anything above clips to worst colour
+// Shared colour scale
+const DIST_MAX = 2.6; // km — max distance cap
 const COLOUR_STOPS = [
     { at: 0,    colour: '#313695' }, // deep blue — very close
-    { at: 0.25, colour: '#4575b4' }, // blue
-    { at: 0.5,  colour: '#abd9e9' }, // light blue
-    { at: 0.75, colour: '#fee090' }, // yellow
-    { at: 1.0,  colour: '#f46d43' }, // orange
-    { at: 1.5,  colour: '#a50026' }, // deep red — worst
+    { at: 0.5,  colour: '#4575b4' }, // blue
+    { at: 1.0,  colour: '#abd9e9' }, // light blue
+    { at: 1.5,  colour: '#fee090' }, // yellow
+    { at: 2.0,  colour: '#f46d43' }, // orange
+    { at: 2.6,  colour: '#a50026' }, // deep red — worst
 ];
 
 function distanceToColour(km) {
@@ -72,6 +72,8 @@ function onEachFeature(feature, layer) {
             iconAnchor: [6, 6]
         }));
     }
+
+    markersByTitle[props.title] = marker;
 
     marker.bindPopup(createPopupContent(props), {
         autoPan: true
@@ -243,6 +245,26 @@ function loadGeoJSON() {
 
             const showProcessedOnly = document.getElementById('toggleProcessedOnly').checked;
             renderMap(showProcessedOnly ? processedData : allData);
+
+            // Populate stats box
+            if (data.stats) {
+                const stats = data.stats;
+                const statsEl = document.getElementById('stats-content');
+                statsEl.innerHTML = `
+                    <div>Average distance to replacement: <strong>${stats.avg_distance_km} km</strong></div>
+                    <div>Most distant: <a id="max-pub-link">${stats.max_distance_pub}</a> (<strong>${stats.max_distance_km} km</strong>)</div>
+                `;
+                document.getElementById('max-pub-link').addEventListener('click', () => {
+                    const marker = markersByTitle[stats.max_distance_pub];
+                    if (marker) {
+                        map.setView(marker.getLatLng(), 12);
+                        marker.openPopup();
+                        if (marker.feature) {
+                            showNearestLine(marker.feature);
+                        }
+                    }
+                });
+            }
         })
         .catch(err => console.error('Error loading GeoJSON:', err));
 }

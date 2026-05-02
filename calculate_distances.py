@@ -230,6 +230,34 @@ def main():
     elapsed_sec = int(elapsed_total % 60)
     print(f"\n\nCompleted: {done}/{total} (skipped {skipped} already processed)")
     print(f"Time elapsed: {elapsed_min:02d}:{elapsed_sec:02d}")
+
+    # Calculate stats
+    distances = []
+    max_dist = 0
+    max_pub_title = None
+    for feat in geojson["features"]:
+        nearest = feat["properties"].get("nearest_external_pub")
+        if nearest and nearest.get("distance_km"):
+            d = nearest["distance_km"]
+            distances.append(d)
+            if d > max_dist:
+                max_dist = d
+                max_pub_title = feat["properties"].get("title", "Unknown")
+
+    if distances:
+        avg_dist = round(sum(distances) / len(distances), 3)
+    else:
+        avg_dist = 0
+
+    geojson["stats"] = {
+        "total_pubs": total,
+        "processed": len(distances),
+        "avg_distance_km": avg_dist,
+        "max_distance_km": max_dist,
+        "max_distance_pub": max_pub_title,
+    }
+    print(f"Stats: avg={avg_dist}km, max={max_dist}km ({max_pub_title})")
+
     print(f"Writing final output to {OUTPUT_FILE}...")
     save_progress(geojson)
     print("Done!")
