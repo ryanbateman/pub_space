@@ -2,6 +2,7 @@ import json
 import sys
 import time
 import subprocess
+from difflib import SequenceMatcher
 from math import radians, cos, sin, asin, sqrt
 from pathlib import Path
 
@@ -9,7 +10,7 @@ WHITBREAD_PUBS_FILE = Path(__file__).parent / "whitbread_pubs.geojson"
 OUTPUT_FILE = Path(__file__).parent / "pubs_with_distances.geojson"
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 SEARCH_RADIUS_KM = 50
-SAME_PUB_TOLERANCE_M = 50
+SAME_PUB_TOLERANCE_M = 150
 MAX_PUBS_TO_PROCESS = 200
 
 
@@ -105,10 +106,28 @@ def is_whitbread_pub(ext_lat, ext_lon, whitbread_pubs):
     return False
 
 
+NAME_SIMILARITY_THRESHOLD = 0.7
+
+
+def names_match(name_a, name_b):
+    """Check if two pub names are similar enough to be the same pub."""
+    a = name_a.lower().strip()
+    b = name_b.lower().strip()
+    # Exact match
+    if a == b:
+        return True
+    # One contains the other
+    if a in b or b in a:
+        return True
+    # Fuzzy match
+    ratio = SequenceMatcher(None, a, b).ratio()
+    return ratio >= NAME_SIMILARITY_THRESHOLD
+
+
 QUERY_FAILED = "__QUERY_FAILED__"
 
 
-def find_nearest_external_pub(lat, lon, whitbread_pubs):
+def find_nearest_external_pub(lat, lon, whitbread_pubs, pub_title):
     elements = query_external_pubs(lat, lon)
     if elements is None:
         return QUERY_FAILED
@@ -123,8 +142,11 @@ def find_nearest_external_pub(lat, lon, whitbread_pubs):
             continue
         if is_whitbread_pub(ext_lat, ext_lon, whitbread_pubs):
             continue
-        dist = haversine(lat, lon, ext_lat, ext_lon)
         name = elem.get("tags", {}).get("name", "Unnamed Pub")
+        # Skip if the name matches the queried pub (likely itself in OSM)
+        if names_match(name, pub_title):
+            continue
+        dist = haversine(lat, lon, ext_lat, ext_lon)
         candidates.append({
             "name": name,
             "lat": ext_lat,
@@ -182,7 +204,7 @@ def main():
             done += 1
             continue
 
-        nearest = find_nearest_external_pub(lat, lon, whitbread_pubs)
+        nearest = find_nearest_external_pub(lat, lon, whitbread_pubs, props.get("title", ""))
 
         # If query failed after retries, skip this pub (will retry next run)
         if nearest == QUERY_FAILED:

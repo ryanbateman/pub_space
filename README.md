@@ -58,7 +58,7 @@ Then open http://localhost:8000.
 |-----------|-----------|
 | Preprocessing | Python 3, Overpass API, Haversine distance |
 | Map tiles | OpenStreetMap via Leaflet.js |
-| Heatmap | Leaflet.heat |
+| Heatmap | heatmap.js |
 | Hosting | GitHub Pages |
 
 ## Project Structure
@@ -72,6 +72,15 @@ Then open http://localhost:8000.
 ├── pubs_with_distances.geojson # Generated: pubs enriched with nearest-pub data
 └── SPEC.md                     # Detailed technical specification
 ```
+
+## Known Issues
+
+**Self-matching pubs**: Some results may show the closing pub's nearest replacement as itself (or a near-zero distance). This happens when the pub exists in OpenStreetMap with slightly different coordinates or name than the source data. Mitigations applied:
+
+- Proximity filter: any OSM pub within 150m of a Whitbread pub is excluded
+- Name matching: any OSM pub whose name fuzzy-matches (>70% similarity) the queried pub is excluded
+
+If you spot remaining self-matches, re-running the preprocessing script with the updated filters will correct them.
 
 ## Credits
 

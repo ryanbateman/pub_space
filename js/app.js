@@ -15,7 +15,7 @@ let processedData = null;
 let nearestLineLayer = L.layerGroup();
 let nearestLineEnabled = true;
 let lineHideTimeout = null;
-let popupOpen = false;
+
 let markersByTitle = {};
 
 // Shared colour scale
@@ -41,23 +41,7 @@ function distanceToColour(km) {
 
 
 
-function createPopupContent(props) {
-    let html = `<div class="popup-content"><h3>${props.title}</h3>`;
-    if (props.nearest_external_pub) {
-        const nearest = props.nearest_external_pub;
-        html += `
-            <div class="nearest-info">
-                <strong>Next nearest pub:</strong><br>
-                ${nearest.name}<br>
-                <span class="distance">${nearest.distance_km} km away</span>
-            </div>
-        `;
-    } else {
-        html += `<div class="nearest-info">No replacement pub found within 50km</div>`;
-    }
-    html += `</div>`;
-    return html;
-}
+
 
 function onEachFeature(feature, layer) {
     const props = feature.properties;
@@ -75,10 +59,6 @@ function onEachFeature(feature, layer) {
 
     markersByTitle[props.title] = marker;
 
-    marker.bindPopup(createPopupContent(props), {
-        autoPan: true
-    });
-
     marker.on('mouseover', () => {
         if (lineHideTimeout) {
             clearTimeout(lineHideTimeout);
@@ -87,22 +67,39 @@ function onEachFeature(feature, layer) {
         showNearestLine(feature);
     });
     marker.on('mouseout', () => {
-        if (!popupOpen) {
+        if (!selectedFeature || selectedFeature !== feature) {
             lineHideTimeout = setTimeout(hideNearestLine, 300);
         }
     });
-    marker.on('popupopen', () => {
-        popupOpen = true;
-        if (lineHideTimeout) {
-            clearTimeout(lineHideTimeout);
-            lineHideTimeout = null;
-        }
-        showNearestLine(feature);
+    marker.on('click', () => {
+        map.setView(marker.getLatLng(), 14);
+        selectPub(feature);
     });
-    marker.on('popupclose', () => {
-        popupOpen = false;
-        hideNearestLine();
-    });
+}
+
+let selectedFeature = null;
+
+function selectPub(feature) {
+    selectedFeature = feature;
+    const props = feature.properties;
+    const detailBox = document.getElementById('detail-box');
+    const detailContent = document.getElementById('detail-content');
+
+    let html = `<h3>${props.title}</h3>`;
+    if (props.nearest_external_pub) {
+        const nearest = props.nearest_external_pub;
+        html += `
+            <div><strong>Next nearest pub:</strong></div>
+            <div>${nearest.name}</div>
+            <div class="distance">${nearest.distance_km} km away</div>
+        `;
+    } else {
+        html += `<div>No replacement pub found within 50km</div>`;
+    }
+    detailContent.innerHTML = html;
+    detailBox.style.display = 'block';
+
+    showNearestLine(feature);
 }
 
 function showNearestLine(feature) {
@@ -258,9 +255,8 @@ function loadGeoJSON() {
                     const marker = markersByTitle[stats.max_distance_pub];
                     if (marker) {
                         map.setView(marker.getLatLng(), 12);
-                        marker.openPopup();
                         if (marker.feature) {
-                            showNearestLine(marker.feature);
+                            selectPub(marker.feature);
                         }
                     }
                 });
