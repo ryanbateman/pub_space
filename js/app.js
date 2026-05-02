@@ -79,22 +79,33 @@ function onEachFeature(feature, layer) {
 
 let selectedFeature = null;
 
+function deselectPub() {
+    selectedFeature = null;
+    document.getElementById('detail-box').style.display = 'none';
+    hideNearestLine();
+}
+
 function selectPub(feature) {
     selectedFeature = feature;
     const props = feature.properties;
     const detailBox = document.getElementById('detail-box');
     const detailContent = document.getElementById('detail-content');
 
-    let html = `<h3>${props.title}</h3>`;
+    let html = `<div class="detail-title">${props.title}</div>`;
     if (props.nearest_external_pub) {
         const nearest = props.nearest_external_pub;
         html += `
-            <div><strong>Next nearest pub:</strong></div>
-            <div>${nearest.name}</div>
-            <div class="distance">${nearest.distance_km} km away</div>
+            <div class="detail-row">
+                <span class="detail-label">Nearest replacement</span>
+                <span class="detail-value">${nearest.name}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Distance</span>
+                <span class="detail-value detail-distance">${nearest.distance_km} km</span>
+            </div>
         `;
     } else {
-        html += `<div>No replacement pub found within 50km</div>`;
+        html += `<div class="detail-row"><span class="detail-label">No replacement found within 50km</span></div>`;
     }
     detailContent.innerHTML = html;
     detailBox.style.display = 'block';
@@ -317,6 +328,19 @@ document.getElementById('toggleNearestLine').addEventListener('change', (e) => {
         map.removeLayer(nearestLineLayer);
         hideNearestLine();
     }
+});
+
+map.on('click', () => {
+    if (selectedFeature) {
+        deselectPub();
+    }
+});
+
+// Collapsible sections
+document.querySelectorAll('.collapsible-header').forEach(header => {
+    header.addEventListener('click', () => {
+        header.parentElement.classList.toggle('collapsed');
+    });
 });
 
 loadGeoJSON();

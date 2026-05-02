@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Whitbread Pub Closures - Impact Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,46 +16,53 @@
         <div id="controls">
             <h1>Whitbread Pub Closures</h1>
             <p>These pubs are closing. The heatmap shows where communities are left furthest from their next nearest pub.</p>
-            <div class="layer-toggle">
-                <label><input type="checkbox" id="toggleMarkers" checked> Show Pubs</label>
-                <label><input type="checkbox" id="toggleHeatmap" checked> Show Impact Heatmap</label>
-                <label><input type="checkbox" id="toggleProcessedOnly" checked> Processed Only</label>
-                <label><input type="checkbox" id="toggleNearestLine" checked> Show Nearest Pub Line</label>
-            </div>
             <div id="legend">
                 <h2>Distance to next pub</h2>
                 <div class="legend-bar"></div>
-            <div class="legend-labels">
-                <span>0 km</span>
-                <span>0.5</span>
-                <span>1.0</span>
-                <span>1.5</span>
-                <span>2.0</span>
-                <span>2.6 km</span>
-            </div>
+                <div class="legend-labels">
+                    <span>0 km</span>
+                    <span>0.5</span>
+                    <span>1.0</span>
+                    <span>1.5</span>
+                    <span>2.0</span>
+                    <span>2.6 km</span>
+                </div>
             </div>
         </div>
-        <div id="heatmap-controls">
-            <h2>Heatmap Settings</h2>
-            <div class="slider-group">
-                <label>Min Distance: <span id="val-minDist">0.5</span> km <span class="info-pill" data-tooltip="Pubs closer than this distance to their replacement are excluded from the heatmap entirely.">?</span></label>
-                <input type="range" id="slider-minDist" min="0" max="2" step="0.05" value="0.5">
+        <div id="toggle-box" class="collapsible collapsed">
+            <h2 class="collapsible-header">Layers</h2>
+            <div class="collapsible-content">
+                <div class="layer-toggle">
+                    <label><input type="checkbox" id="toggleMarkers" checked> Show Pubs</label>
+                    <label><input type="checkbox" id="toggleHeatmap" checked> Show Impact Heatmap</label>
+                    <label><input type="checkbox" id="toggleProcessedOnly" checked> Processed Only</label>
+                    <label><input type="checkbox" id="toggleNearestLine" checked> Show Nearest Pub Line</label>
+                </div>
             </div>
-            <div class="slider-group">
-                <label>Intensity Curve: <span id="val-power">1</span> <span class="info-pill" data-tooltip="Controls how aggressively low distances are suppressed. Higher values make only the most distant pubs visible; lower values (closer to 1) give a more linear/even spread.">?</span></label>
-                <input type="range" id="slider-power" min="0.5" max="4" step="0.25" value="1">
-            </div>
-            <div class="slider-group">
-                <label>Radius: <span id="val-radius">30</span> px <span class="info-pill" data-tooltip="The pixel radius of each heat point. Larger values create broader, more overlapping blobs; smaller values produce tighter, more isolated spots.">?</span></label>
-                <input type="range" id="slider-radius" min="10" max="80" step="2" value="30">
-            </div>
-            <div class="slider-group">
-                <label>Blur: <span id="val-blur">21</span> px <span class="info-pill" data-tooltip="How much each heat point is blurred at its edges. Higher values create softer gradients; lower values give sharper boundaries.">?</span></label>
-                <input type="range" id="slider-blur" min="5" max="50" step="2" value="21">
-            </div>
-            <div class="slider-group">
-                <label>Max Opacity: <span id="val-maxOpacity">0.5</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
-                <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.5">
+        </div>
+        <div id="heatmap-controls" class="collapsible collapsed">
+            <h2 class="collapsible-header">Heatmap Settings</h2>
+            <div class="collapsible-content">
+                <div class="slider-group">
+                    <label>Min Distance: <span id="val-minDist">0.5</span> km <span class="info-pill" data-tooltip="Pubs closer than this distance to their replacement are excluded from the heatmap entirely.">?</span></label>
+                    <input type="range" id="slider-minDist" min="0" max="2" step="0.05" value="0.5">
+                </div>
+                <div class="slider-group">
+                    <label>Intensity Curve: <span id="val-power">1</span> <span class="info-pill" data-tooltip="Controls how aggressively low distances are suppressed. Higher values make only the most distant pubs visible; lower values (closer to 1) give a more linear/even spread.">?</span></label>
+                    <input type="range" id="slider-power" min="0.5" max="4" step="0.25" value="1">
+                </div>
+                <div class="slider-group">
+                    <label>Radius: <span id="val-radius">30</span> px <span class="info-pill" data-tooltip="The pixel radius of each heat point. Larger values create broader, more overlapping blobs; smaller values produce tighter, more isolated spots.">?</span></label>
+                    <input type="range" id="slider-radius" min="10" max="80" step="2" value="30">
+                </div>
+                <div class="slider-group">
+                    <label>Blur: <span id="val-blur">21</span> px <span class="info-pill" data-tooltip="How much each heat point is blurred at its edges. Higher values create softer gradients; lower values give sharper boundaries.">?</span></label>
+                    <input type="range" id="slider-blur" min="5" max="50" step="2" value="21">
+                </div>
+                <div class="slider-group">
+                    <label>Max Opacity: <span id="val-maxOpacity">0.5</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
+                    <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.5">
+                </div>
             </div>
         </div>
         <div id="stats-box">
@@ -61,13 +70,11 @@
             <div id="stats-content">Loading...</div>
         </div>
         <div id="detail-box" style="display:none;">
-            <h2>Selected Pub</h2>
             <div id="detail-content"></div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/plugins/leaflet-heatmap/leaflet-heatmap.js"></script>
     <script src="js/app.js"></script>
