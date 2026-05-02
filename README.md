@@ -2,7 +2,7 @@
 
 An interactive map visualising the impact of Whitbread pub closures (Beefeater, Brewers Fayre, etc.) across the UK. For each closing pub, it calculates the distance to the next nearest non-Whitbread pub — highlighting communities that will be left furthest from their local.
 
-**[View the live map](https://ryanb.github.io/pub_space/)**
+**[View the live map](https://ryanbateman.github.io/pub_space/)**
 
 ## How It Works
 
@@ -11,7 +11,7 @@ An interactive map visualising the impact of Whitbread pub closures (Beefeater, 
 3. **Frontend** (`index.html`) renders the results on a Leaflet.js map with:
    - Colour-coded markers (blue = close replacement, red = distant replacement)
    - A distance-weighted heatmap showing where the impact is worst
-   - Hover/click lines showing the path to the nearest replacement pub
+   - Click a pub to see details in the sidebar, with a line drawn to its nearest replacement
    - Adjustable heatmap parameters for exploring the data
 
 ## Data Flow
@@ -42,7 +42,7 @@ pubs_with_distances.geojson
 python3 calculate_distances.py
 ```
 
-The script is incremental — if interrupted, re-running it will skip already-processed pubs and resume where it left off.
+The script is incremental — if interrupted, re-running it will skip already-processed pubs and resume where it left off. To force a full re-run (e.g. after changing filters), delete `pubs_with_distances.geojson` first.
 
 ### Serving the map
 
@@ -58,8 +58,9 @@ Then open http://localhost:8000.
 |-----------|-----------|
 | Preprocessing | Python 3, Overpass API, Haversine distance |
 | Map tiles | OpenStreetMap via Leaflet.js |
-| Heatmap | heatmap.js |
-| Hosting | GitHub Pages |
+| Heatmap | heatmap.js + leaflet-heatmap plugin |
+| Typography | Roboto (Google Fonts) |
+| Hosting | GitHub Pages (auto-deploy via Actions) |
 
 ## Project Structure
 
@@ -69,8 +70,7 @@ Then open http://localhost:8000.
 ├── js/app.js                   # Map rendering logic
 ├── calculate_distances.py      # Preprocessing script
 ├── whitbread_pubs.geojson      # Source: 198 Whitbread pub locations
-├── pubs_with_distances.geojson # Generated: pubs enriched with nearest-pub data
-└── SPEC.md                     # Detailed technical specification
+└── pubs_with_distances.geojson # Generated: pubs enriched with nearest-pub data
 ```
 
 ## Known Issues
