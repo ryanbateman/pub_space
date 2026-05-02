@@ -150,8 +150,9 @@ body {
     font-weight: bold;
     cursor: help;
     position: relative;
-    vertical-align: middle;
+    vertical-align: text-top;
     margin-left: 4px;
+    line-height: 1;
 }
 
 .info-pill:hover {

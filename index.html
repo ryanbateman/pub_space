@@ -52,15 +52,16 @@
                 <input type="range" id="slider-blur" min="5" max="50" step="2" value="18">
             </div>
             <div class="slider-group">
-                <label>Min Opacity: <span id="val-minOpacity">0.4</span> <span class="info-pill" data-tooltip="The minimum visibility of any heat point on the map. Higher values make even low-intensity points clearly visible; lower values let them fade away.">?</span></label>
-                <input type="range" id="slider-minOpacity" min="0" max="1" step="0.05" value="0.4">
+                <label>Max Opacity: <span id="val-maxOpacity">0.8</span> <span class="info-pill" data-tooltip="The maximum opacity of the hottest points. Points fade down from this value based on their intensity.">?</span></label>
+                <input type="range" id="slider-maxOpacity" min="0.1" max="1" step="0.05" value="0.8">
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/plugins/leaflet-heatmap/leaflet-heatmap.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

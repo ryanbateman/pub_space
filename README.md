@@ -2,7 +2,7 @@
 
 An interactive map visualising the impact of Whitbread pub closures (Beefeater, Brewers Fayre, etc.) across the UK. For each closing pub, it calculates the distance to the next nearest non-Whitbread pub — highlighting communities that will be left furthest from their local.
 
-**[View the live map](https://ryanb.github.io/pub_space/)** *(update URL after publishing)*
+**[View the live map](https://ryanb.github.io/pub_space/)**
 
 ## How It Works
 

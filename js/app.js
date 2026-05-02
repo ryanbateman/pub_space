@@ -39,14 +39,7 @@ function distanceToColour(km) {
     return COLOUR_STOPS[0].colour;
 }
 
-// Build Leaflet.heat gradient object from shared stops
-function buildHeatGradient() {
-    const grad = {};
-    COLOUR_STOPS.forEach(s => {
-        grad[Math.min(s.at / DIST_MAX, 1)] = s.colour;
-    });
-    return grad;
-}
+
 
 function createPopupContent(props) {
     let html = `<div class="popup-content"><h3>${props.title}</h3>`;
@@ -165,46 +158,60 @@ function getHeatmapParams() {
         power: parseFloat(document.getElementById('slider-power').value),
         radius: parseInt(document.getElementById('slider-radius').value),
         blur: parseInt(document.getElementById('slider-blur').value),
-        minOpacity: parseFloat(document.getElementById('slider-minOpacity').value),
+        maxOpacity: parseFloat(document.getElementById('slider-maxOpacity').value),
     };
 }
 
 function buildHeatmap(data) {
     const params = getHeatmapParams();
-    const GRID_SIZE = 0.15; // degrees (~15km)
-    const grid = {};
 
+    // Collect filtered points
+    const points = [];
     data.features.forEach(feat => {
         if (feat.properties.nearest_external_pub) {
             const [lon, lat] = feat.geometry.coordinates;
             const dist = feat.properties.nearest_external_pub.distance_km;
-
-            if (dist < params.minDist) return;
-
-            const cellKey = `${Math.floor(lat / GRID_SIZE)}_${Math.floor(lon / GRID_SIZE)}`;
-            if (!grid[cellKey] || dist > grid[cellKey].dist) {
-                grid[cellKey] = { lat, lon, dist };
+            if (dist >= params.minDist) {
+                points.push({ lat, lng: lon, dist });
             }
         }
     });
 
-    const heatPoints = Object.values(grid).map(cell => {
-        const intensity = Math.pow(Math.min(cell.dist / DIST_MAX, 1), params.power);
-        return [cell.lat, cell.lon, intensity];
+    // Find actual max distance for normalisation
+    const maxDist = points.reduce((max, p) => Math.max(max, p.dist), params.minDist);
+    const range = maxDist - params.minDist;
+
+    // Apply power curve to get per-point value
+    const heatData = points.map(p => {
+        const norm = range > 0 ? (p.dist - params.minDist) / range : 1;
+        const value = Math.pow(norm, params.power);
+        return { lat: p.lat, lng: p.lng, value };
     });
 
     if (heatLayer) {
         map.removeLayer(heatLayer);
     }
 
-    heatLayer = L.heatLayer(heatPoints, {
+    heatLayer = new HeatmapOverlay({
         radius: params.radius,
-        blur: params.blur,
-        maxZoom: 17,
-        minOpacity: params.minOpacity,
-        max: 1.0,
-        gradient: buildHeatGradient()
+        blur: params.blur / 50, // heatmap.js blur is 0-1 scale
+        maxOpacity: params.maxOpacity,
+        scaleRadius: false,
+        useLocalExtrema: false,
+        latField: 'lat',
+        lngField: 'lng',
+        valueField: 'value',
+        gradient: {
+            0.0: '#313695',
+            0.17: '#4575b4',
+            0.33: '#abd9e9',
+            0.5: '#fee090',
+            0.67: '#f46d43',
+            1.0: '#a50026'
+        }
     });
+
+    heatLayer.setData({ max: 1, data: heatData });
 
     if (document.getElementById('toggleHeatmap').checked) {
         map.addLayer(heatLayer);
@@ -218,7 +225,7 @@ function rebuildHeatmap() {
 }
 
 // Slider event listeners
-['minDist', 'power', 'radius', 'blur', 'minOpacity'].forEach(param => {
+['minDist', 'power', 'radius', 'blur', 'maxOpacity'].forEach(param => {
     const slider = document.getElementById(`slider-${param}`);
     const valSpan = document.getElementById(`val-${param}`);
     slider.addEventListener('input', () => {
