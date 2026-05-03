@@ -73,6 +73,25 @@ Then open http://localhost:8000.
 └── pubs_with_distances.geojson # Generated: pubs enriched with nearest-pub data
 ```
 
+## Heatmap Calculation
+
+The heatmap visualises how far each closing pub is from its nearest replacement. It uses [heatmap.js](https://www.patrick-wied.at/static/heatmapjs/) with per-point intensity values derived from the distance data. The rendering pipeline works as follows:
+
+1. **Filter** — Pubs with a replacement distance below the **Min Distance** threshold are excluded entirely from the heatmap.
+2. **Normalise** — Remaining distances are normalised to a 0–1 range between Min Distance and the maximum distance in the filtered dataset.
+3. **Power curve** — The normalised value is raised to the power set by the **Intensity Curve** slider. A value of 1 gives a linear mapping; higher values suppress low-distance pubs and emphasise the most distant ones.
+4. **Render** — Each point is drawn with pixel size set by **Radius**, edge softness by **Blur**, and peak visibility by **Max Opacity**. The colour gradient runs from blue (low intensity) through yellow to red (high intensity).
+
+All parameters are adjustable via the Heatmap Settings panel in the sidebar:
+
+| Slider | Default | Effect |
+|--------|---------|--------|
+| Min Distance | 0.5 km | Excludes pubs closer than this from the heatmap |
+| Intensity Curve | 1.0 | Power exponent applied to normalised distance (1 = linear) |
+| Radius | 30 px | Pixel radius of each heat point |
+| Blur | 21 px | Edge softness of each heat point |
+| Max Opacity | 0.5 | Maximum opacity of the hottest points |
+
 ## Known Issues
 
 **Self-matching pubs**: Some results may show the closing pub's nearest replacement as itself (or a near-zero distance). This happens when the pub exists in OpenStreetMap with slightly different coordinates or name than the source data. Mitigations applied:
