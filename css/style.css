@@ -216,13 +216,9 @@ body {
 
 #stats-content a {
     color: var(--colour-whitbread);
-    text-decoration: none;
+    text-decoration: underline;
     font-weight: 500;
     cursor: pointer;
-}
-
-#stats-content a:hover {
-    text-decoration: underline;
 }
 
 /* Detail box (selected pub) — visually distinct from permanent boxes */
