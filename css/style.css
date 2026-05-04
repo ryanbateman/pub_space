@@ -1,3 +1,13 @@
+:root {
+    --colour-whitbread: #4575b4;
+    --colour-replacement: #e74c3c;
+    --colour-text: #333;
+    --colour-text-light: #444;
+    --colour-text-muted: #888;
+    --colour-text-heading: #1a1a1a;
+    --colour-border: #eee;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +17,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
-    color: #333;
+    color: var(--colour-text);
 }
 
 #map {
@@ -26,6 +36,8 @@ body {
     flex-direction: column;
     gap: 10px;
     max-width: 300px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
 }
 
 /* Shared box styles */
@@ -47,7 +59,7 @@ body {
     font-size: 16px;
     font-weight: 700;
     margin-bottom: 6px;
-    color: #1a1a1a;
+    color: var(--colour-text-heading);
 }
 
 #controls p {
@@ -96,9 +108,9 @@ body {
 /* Collapsible sections */
 
 .collapsible-header {
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--colour-text-light);
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -140,7 +152,7 @@ body {
     font-size: 13px;
     font-weight: 400;
     cursor: pointer;
-    color: #444;
+    color: var(--colour-text-light);
 }
 
 /* Heatmap sliders */
@@ -164,27 +176,46 @@ body {
 
 /* Stats box */
 
-#stats-box h2,
-#detail-box h2 {
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 8px;
+#stats-box h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--colour-text-light);
+    margin-bottom: 10px;
 }
 
 #stats-content {
     font-size: 13px;
     font-weight: 400;
-    color: #444;
-    line-height: 1.7;
+    color: var(--colour-text-light);
 }
 
-#stats-content strong {
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--colour-text-muted);
+}
+
+.stat-value {
+    font-size: 13px;
     font-weight: 500;
+    color: var(--colour-text);
+    text-align: right;
+}
+
+.stat-distance {
+    color: var(--colour-replacement);
+    font-weight: 700;
 }
 
 #stats-content a {
-    color: #e74c3c;
+    color: var(--colour-whitbread);
     text-decoration: none;
     font-weight: 500;
     cursor: pointer;
@@ -194,28 +225,26 @@ body {
     text-decoration: underline;
 }
 
-/* Detail box (selected pub) */
+/* Detail box (selected pub) — visually distinct from permanent boxes */
 
-#detail-box h2 {
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 8px;
+#detail-box {
+    border-left: 3px solid var(--colour-whitbread);
+    background: #f8f9fc;
 }
 
 #detail-content {
     font-size: 13px;
     font-weight: 400;
-    color: #444;
+    color: var(--colour-text-light);
 }
 
 .detail-title {
     font-size: 14px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--colour-whitbread);
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--colour-border);
 }
 
 .detail-row {
@@ -227,20 +256,53 @@ body {
 
 .detail-label {
     font-size: 12px;
-    font-weight: 400;
-    color: #888;
+    font-weight: 500;
+    color: var(--colour-text-muted);
 }
 
 .detail-value {
     font-size: 13px;
     font-weight: 500;
-    color: #333;
+    color: var(--colour-text);
     text-align: right;
 }
 
+.detail-value-replacement {
+    color: var(--colour-replacement);
+}
+
 .detail-distance {
-    color: #e74c3c;
+    color: var(--colour-replacement);
     font-weight: 700;
+}
+
+/* Map labels (shown on pub selection) */
+
+.map-label {
+    background: none;
+    border: none;
+}
+
+.map-label-text {
+    background: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.map-label-text.map-label-nearest {
+    color: var(--colour-replacement);
+    border-left: 3px solid var(--colour-replacement);
+}
+
+.map-label-text.map-label-selected {
+    color: var(--colour-whitbread);
+    border-left: 3px solid var(--colour-whitbread);
 }
 
 /* Info pills */
@@ -263,11 +325,13 @@ body {
     line-height: 1;
 }
 
-.info-pill:hover {
+.info-pill:hover,
+.info-pill.active {
     background: #888;
 }
 
-.info-pill:hover::after {
+.info-pill:hover::after,
+.info-pill.active::after {
     content: attr(data-tooltip);
     position: absolute;
     bottom: calc(100% + 6px);
@@ -285,7 +349,8 @@ body {
     pointer-events: none;
 }
 
-.info-pill:hover::before {
+.info-pill:hover::before,
+.info-pill.active::before {
     content: '';
     position: absolute;
     bottom: calc(100% + 2px);
@@ -294,4 +359,81 @@ body {
     border-top-color: #333;
     z-index: 2000;
     pointer-events: none;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 480px) {
+    #sidebar {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        max-width: 100%;
+        max-height: 45vh;
+        overflow-y: auto;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 12px 12px 0 0;
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+    }
+
+    #controls,
+    #toggle-box,
+    #heatmap-controls,
+    #stats-box,
+    #detail-box {
+        padding: 10px 14px;
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+    #controls h1 {
+        font-size: 14px;
+    }
+
+    #controls p {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .collapsible-header {
+        font-size: 12px;
+        padding: 2px 0;
+    }
+
+    .layer-toggle label {
+        font-size: 12px;
+    }
+
+    .slider-group label {
+        font-size: 11px;
+    }
+
+    .detail-title {
+        font-size: 13px;
+    }
+
+    .detail-label,
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .detail-value,
+    .stat-value {
+        font-size: 12px;
+    }
+
+    .legend-labels {
+        font-size: 9px;
+    }
+
+    #legend h2,
+    #stats-box h2 {
+        font-size: 11px;
+    }
+
+    /* Larger tap targets for markers - handled in JS */
 }

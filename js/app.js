@@ -1,4 +1,6 @@
 const DATA_FILE = 'pubs_with_distances.geojson';
+const isMobile = window.innerWidth <= 480;
+const MARKER_SIZE = isMobile ? 16 : 12;
 const map = L.map('map').setView([52.5, -1.5], 6);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -49,11 +51,12 @@ function onEachFeature(feature, layer) {
 
     if (props.nearest_external_pub) {
         const dist = props.nearest_external_pub.distance_km;
+        const half = MARKER_SIZE / 2;
         marker.setIcon(L.divIcon({
             className: 'custom-marker',
-            html: `<div style="background:${distanceToColour(dist)};width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6]
+            html: `<div style="background:${distanceToColour(dist)};width:${MARKER_SIZE}px;height:${MARKER_SIZE}px;border-radius:50%;border:2px solid white;"></div>`,
+            iconSize: [MARKER_SIZE, MARKER_SIZE],
+            iconAnchor: [half, half]
         }));
     }
 
@@ -97,7 +100,7 @@ function selectPub(feature) {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Nearest replacement</span>
-                <span class="detail-value">${nearest.name}</span>
+                <span class="detail-value detail-value-replacement">${nearest.name}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Distance</span>
@@ -142,6 +145,30 @@ function showNearestLine(feature) {
             iconSize: [8, 8],
             iconAnchor: [4, 4]
         })
+    }).addTo(nearestLineLayer);
+
+    // Map labels
+    const pubTitle = feature.properties.title || 'Unknown';
+    const nearestName = nearest.name || 'Unknown';
+
+    L.marker([lat, lon], {
+        icon: L.divIcon({
+            className: 'map-label',
+            html: `<span class="map-label-text map-label-selected">${pubTitle}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [-8, 12]
+        }),
+        interactive: false
+    }).addTo(nearestLineLayer);
+
+    L.marker([nearest.lat, nearest.lon], {
+        icon: L.divIcon({
+            className: 'map-label',
+            html: `<span class="map-label-text map-label-nearest">${nearestName}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [-8, 12]
+        }),
+        interactive: false
     }).addTo(nearestLineLayer);
 }
 
@@ -259,8 +286,18 @@ function loadGeoJSON() {
                 const stats = data.stats;
                 const statsEl = document.getElementById('stats-content');
                 statsEl.innerHTML = `
-                    <div>Average distance to replacement: <strong>${stats.avg_distance_km} km</strong></div>
-                    <div>Most distant: <a id="max-pub-link">${stats.max_distance_pub}</a> (<strong>${stats.max_distance_km} km</strong>)</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg. distance</span>
+                        <span class="stat-value">${stats.avg_distance_km} km</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Most distant</span>
+                        <span class="stat-value"><a id="max-pub-link">${stats.max_distance_pub}</a></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Distance</span>
+                        <span class="stat-value stat-distance">${stats.max_distance_km} km</span>
+                    </div>
                 `;
                 document.getElementById('max-pub-link').addEventListener('click', () => {
                     const marker = markersByTitle[stats.max_distance_pub];
@@ -341,6 +378,23 @@ document.querySelectorAll('.collapsible-header').forEach(header => {
     header.addEventListener('click', () => {
         header.parentElement.classList.toggle('collapsed');
     });
+});
+
+// Mobile: info pill tap-to-toggle support
+document.querySelectorAll('.info-pill').forEach(pill => {
+    pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasActive = pill.classList.contains('active');
+        document.querySelectorAll('.info-pill.active').forEach(p => p.classList.remove('active'));
+        if (!wasActive) {
+            pill.classList.add('active');
+        }
+    });
+});
+
+// Close active info pills when tapping elsewhere
+document.addEventListener('click', () => {
+    document.querySelectorAll('.info-pill.active').forEach(p => p.classList.remove('active'));
 });
 
 loadGeoJSON();
